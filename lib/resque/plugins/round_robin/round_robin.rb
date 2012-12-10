@@ -26,6 +26,20 @@ module Resque::Plugins
 
     DEFAULT_QUEUE_DEPTH = 0
     def should_work_on_queue? queuename
+
+      # megahack :(
+      #
+      # tried to use an env variable for a less hacky hack, but i dont
+      # know how to get env variables into the EY resque daemon, and
+      # Ive been fighting to get this to round-robining system to work
+      # for five hours now.  If you hate this, you can fix it.
+      #
+      if !queuename.to_s.index("replay").nil?
+        if Resque.size("python") > 2
+          return false
+        end
+      end
+
       return true if @queues.include? '*'  # workers with QUEUES=* are special and are not subject to queue depth setting
       max = DEFAULT_QUEUE_DEPTH
       unless ENV["RESQUE_QUEUE_DEPTH"].nil? || ENV["RESQUE_QUEUE_DEPTH"] == ""
@@ -40,18 +54,13 @@ module Resque::Plugins
 
     def reserve_with_round_robin
 
-      # DJs hack: allow this resque process to watch a named queue
-      # (python), and if that queue has more than a certain number of
-      # items on it, then we do nothing.  This is a big hack to get
-      # around the lack of round-robining in pyres.
-      if ENV["RESQUE_DEPENDENT_ON"].present?
-        if Resque.size(ENV["RESQUE_DEPENDENT_ON"]) > ENV["RESQUE_DEPENDENT_MAX"].to_i
-          return nil
-        end
-      end
-
       qs = rotated_queues
       qs.each do |queue|
+
+        if queue.to_s.index("replay")
+          
+        end
+
         log! "Checking #{queue}"
         if should_work_on_queue?(queue) && job = Resque::Job.reserve(queue)
           log! "Found job on #{queue}"
