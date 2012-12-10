@@ -39,6 +39,17 @@ module Resque::Plugins
     end
 
     def reserve_with_round_robin
+
+      # DJs hack: allow this resque process to watch a named queue
+      # (python), and if that queue has more than a certain number of
+      # items on it, then we do nothing.  This is a big hack to get
+      # around the lack of round-robining in pyres.
+      if ENV["RESQUE_DEPENDENT_ON"].present?
+        if Resque.size(ENV["RESQUE_DEPENDENT_ON"]) > ENV["RESQUE_DEPENDENT_MAX"]
+          return nil
+        end
+      end
+
       qs = rotated_queues
       qs.each do |queue|
         log! "Checking #{queue}"
