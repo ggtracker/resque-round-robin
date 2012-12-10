@@ -45,7 +45,7 @@ module Resque::Plugins
       # items on it, then we do nothing.  This is a big hack to get
       # around the lack of round-robining in pyres.
       if ENV["RESQUE_DEPENDENT_ON"].present?
-        if Resque.size(ENV["RESQUE_DEPENDENT_ON"]) > ENV["RESQUE_DEPENDENT_MAX"]
+        if Resque.size(ENV["RESQUE_DEPENDENT_ON"]) > ENV["RESQUE_DEPENDENT_MAX"].to_i
           return nil
         end
       end
