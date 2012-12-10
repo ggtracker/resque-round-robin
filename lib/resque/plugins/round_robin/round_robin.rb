@@ -34,7 +34,7 @@ module Resque::Plugins
       # Ive been fighting to get this to round-robining system to work
       # for five hours now.  If you hate this, you can fix it.
       #
-      if queuename != 'replay' && !queuename.to_s.index('replay').nil?
+      if queuename.to_s != 'replay' && !queuename.to_s.index('replay').nil?
         if Resque.size("python") > 2
           return false
         end
@@ -56,11 +56,6 @@ module Resque::Plugins
 
       qs = rotated_queues
       qs.each do |queue|
-
-        if queue.to_s.index("replay")
-          
-        end
-
         log! "Checking #{queue}"
         if should_work_on_queue?(queue) && job = Resque::Job.reserve(queue)
           log! "Found job on #{queue}"
