@@ -34,7 +34,7 @@ module Resque::Plugins
       # Ive been fighting to get this to round-robining system to work
       # for five hours now.  If you hate this, you can fix it.
       #
-      if queuename.to_s != 'replay' && !queuename.to_s.index('replay').nil?
+      unless ['replays', 'replays-high'].include?(queuename.to_s) || queuename.to_s.index('replay').nil?
         if Resque.size("python") > 2
           return false
         end
