@@ -34,10 +34,8 @@ module Resque::Plugins
       # Ive been fighting to get this to round-robining system to work
       # for five hours now.  If you hate this, you can fix it.
       #
-      unless ['replays', 'replays-high'].include?(queuename.to_s) || queuename.to_s.index('replay').nil?
-        if Resque.size("python") > 2
-          return false
-        end
+      if Resque.size("python") > 2
+        return false
       end
 
       return true if @queues.include? '*'  # workers with QUEUES=* are special and are not subject to queue depth setting
@@ -60,6 +58,7 @@ module Resque::Plugins
 
     def reserve_with_round_robin
       if not should_round_robin?
+        print "reserving without round robin"
         return reserve_without_round_robin
       end
 
