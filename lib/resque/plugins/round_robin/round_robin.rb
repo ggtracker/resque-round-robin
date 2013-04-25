@@ -52,7 +52,16 @@ module Resque::Plugins
       false
     end
 
+    # if any of our queues are wildcarded, then we want to round robin among them
+    def should_round_robin?
+      return @srr unless @srr.nil?
+      @srr = @queues.include? '*'
+    end
+
     def reserve_with_round_robin
+      if not should_round_robin?
+        return reserve_without_round_robin
+      end
 
       qs = rotated_queues
       qs.each do |queue|
