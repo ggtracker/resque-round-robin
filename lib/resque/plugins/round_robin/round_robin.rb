@@ -58,7 +58,6 @@ module Resque::Plugins
 
     def reserve_with_round_robin
       if not should_round_robin?
-        print "reserving without round robin"
         return reserve_without_round_robin
       end
 
