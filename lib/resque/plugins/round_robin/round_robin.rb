@@ -35,28 +35,24 @@ module Resque::Plugins
       # for five hours now.  If you hate this, you can fix it.
       #
       if Resque.size("python") > 2
+#        $stderr.puts "not working on queue, python queue too big. (I have #{queues.size} queues)"
         return false
       end
 
-      return true if @queues.include? '*'  # workers with QUEUES=* are special and are not subject to queue depth setting
-      max = DEFAULT_QUEUE_DEPTH
-      unless ENV["RESQUE_QUEUE_DEPTH"].nil? || ENV["RESQUE_QUEUE_DEPTH"] == ""
-        max = ENV["RESQUE_QUEUE_DEPTH"].to_i
-      end
-      return true if max == 0 # 0 means no limiting
-      cur_depth = queue_depth(queuename)
-      log! "queue #{queuename} depth = #{cur_depth} max = #{max}"
-      return true if cur_depth < max
-      false
+#      $stderr.puts "working on queue, python queue is small. (I have #{queues.size} queues)"
+
+      return true if not ['replays-low, replays-high'].include?(queuename)
     end
 
     # if any of our queues are wildcarded, then we want to round robin among them
     def should_round_robin?
+#      $stderr.puts "srr, @srr = #{@srr} queues=#{queues} @queues=#{@queues}"
       return @srr unless @srr.nil?
-      @srr = @queues.include? '*'
+      @srr = @queues[0].include? '*'
     end
 
     def reserve_with_round_robin
+
       if not should_round_robin?
         return reserve_without_round_robin
       end
