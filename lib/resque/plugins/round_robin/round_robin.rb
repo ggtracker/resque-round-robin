@@ -39,9 +39,9 @@ module Resque::Plugins
         return false
       end
 
-#      $stderr.puts "working on queue, python queue is small. (I have #{queues.size} queues)"
+      # $stderr.puts "working on queue #{queuename}, python queue is small. (I have #{queues.size} queues)"
 
-      return true if not ['replays-low, replays-high'].include?(queuename)
+      return true if not ['replays-low', 'replays-high'].include?(queuename)
     end
 
     # if any of our queues are wildcarded, then we want to round robin among them
