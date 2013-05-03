@@ -34,7 +34,7 @@ module Resque::Plugins
       # Ive been fighting to get this to round-robining system to work
       # for five hours now.  If you hate this, you can fix it.
       #
-      if Resque.size("python") > 2
+      if Resque.size("python") > 8
 #        $stderr.puts "not working on queue, python queue too big. (I have #{queues.size} queues)"
         return false
       end
